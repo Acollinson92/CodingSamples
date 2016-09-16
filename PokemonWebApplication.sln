@@ -1,22 +1,168 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokemonWebApplication", "PokemonWebApplication\PokemonWebApplication.csproj", "{5C3615EC-FBE1-443D-AE65-4167CC4591EA}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5C3615EC-FBE1-443D-AE65-4167CC4591EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5C3615EC-FBE1-443D-AE65-4167CC4591EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5C3615EC-FBE1-443D-AE65-4167CC4591EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5C3615EC-FBE1-443D-AE65-4167CC4591EA}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-EndGlobal
+using MySql.Data.MySqlClient;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace PokemonWebApplication
+{
+    public partial class Default : System.Web.UI.Page
+    {
+        MySqlConnection con;
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                loadPoke00(-1);
+            }
+        }
+
+        private void loadPoke00(int SelectedItemIn)
+        {
+            con = new MySqlConnection("Data Source=localhost;Database=pokemon;User ID=root;Password=password");
+
+            Response.Write("Connect");
+            ListItem newItem = new ListItem();
+            try
+            {
+                con.Open();
+                MySqlCommand cmd = new MySqlCommand("Select * FROM pokemon order by name", con);
+                MySqlDataReader reader;
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    newItem = new ListItem();
+                    newItem.Text = reader["name"].ToString();
+                    newItem.Value = reader["id"].ToString();
+                    Pokemon00.Items.Add(newItem);
+                }
+
+                reader.Close();
+
+
+            }
+            catch (MySqlException ex)
+            {
+                Response.Write(ex);
+            }
+            finally
+            {
+                con.Close();
+            }
+            Pokemon00.SelectedIndex = SelectedItemIn;
+        }
+
+        protected void Pokemon00_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            con = new MySqlConnection("Data Source=localhost;Database=pokemon;User ID=root;                                                                                                                               Password=gutwrench1");
+
+            Response.Write("Connect");
+            ListItem newItem = new ListItem();
+            int pid = 0;
+            Int32.TryParse(Pokemon00.SelectedValue, out pid);
+            Moves00.Items.Clear();
+            Moves01.Items.Clear();
+            Moves02.Items.Clear();
+            Moves03.Items.Clear();
+            try
+            {
+                con.Open();
+                MySqlCommand cmd = new MySqlCommand("SELECT * FROM pokemon.pmv where pid = " + pid, con);
+                MySqlDataReader reader;
+                reader = cmd.ExecuteReader();
+                newItem = new ListItem();
+                newItem.Text = " ";
+                newItem.Value = "0";
+                Moves00.Items.Add(newItem);
+                Moves01.Items.Add(newItem);
+                Moves02.Items.Add(newItem);
+                Moves03.Items.Add(newItem);
+                
+                while (reader.Read())
+                {
+                    newItem = new ListItem();
+                    newItem.Text = reader["mname"].ToString();
+                    newItem.Value = reader["mid"].ToString();
+                    Moves00.Items.Add(newItem);
+                    Moves01.Items.Add(newItem);
+                    Moves02.Items.Add(newItem);
+                    Moves03.Items.Add(newItem);
+                }
+                con.Close();
+
+            }
+            catch (MySqlException ex)
+            {
+                Response.Write(ex);
+            }
+            finally
+            {
+                con.Close();
+            }
+
+        }
+
+        protected void Moves00_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int selected1 = Moves00.SelectedIndex;
+            int selected2 = Moves01.SelectedIndex;
+            int selected3 = Moves02.SelectedIndex;
+            int selected4 = Moves03.SelectedIndex;
+
+            if (selected1 == selected2 || selected1 == selected3 || selected1 == selected4)
+            {
+                Moves00.SelectedIndex = -1;
+                ClientScript.RegisterStartupScript(GetType(), "alert", "alert('move already selected')", true);
+            }
+        }
+
+        protected void Moves01_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int selected1 = Moves00.SelectedIndex;
+            int selected2 = Moves01.SelectedIndex;
+            int selected3 = Moves02.SelectedIndex;
+            int selected4 = Moves03.SelectedIndex;
+
+            if (selected2 == selected1 || selected2 == selected3 || selected2 == selected4)
+            {
+                Moves01.SelectedIndex = -1;
+                ClientScript.RegisterStartupScript(GetType(), "alert", "alert('move already selected')", true);
+            }
+        }
+        protected void Moves02_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int selected1 = Moves00.SelectedIndex;
+            int selected2 = Moves01.SelectedIndex;
+            int selected3 = Moves02.SelectedIndex;
+            int selected4 = Moves03.SelectedIndex;
+
+            if (selected3 == selected2 || selected3 == selected1 || selected3 == selected4)
+            {
+                Moves02.SelectedIndex = -1;
+                ClientScript.RegisterStartupScript(GetType(), "alert", "alert('move already selected')", true);
+            }
+        }
+
+        protected void Moves03_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int selected1 = Moves00.SelectedIndex;
+            int selected2 = Moves01.SelectedIndex;
+            int selected3 = Moves02.SelectedIndex;
+            int selected4 = Moves03.SelectedIndex;
+
+            if (selected4 == selected2 || selected4 == selected3 || selected4 == selected1)
+            {
+                Moves03.SelectedIndex = -1;
+                ClientScript.RegisterStartupScript(GetType(), "alert", "alert('move already selected')", true);
+            }
+        }
+
+        factory pokeFactory = new factory();
+
+        pokefactory.buildPokemon(Pname, m1, m2, m3, m4);
+    }
+}
